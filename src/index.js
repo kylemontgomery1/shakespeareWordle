@@ -10,8 +10,7 @@ class Box extends React.Component {
     return (
       <div
         className={
-          "card text-white text-center pt-5 pb-5 pt-5 pl-2 pr-2 bg-" +
-          this.props.color
+          "card text-white text-center p-4  px-5 bg-" + this.props.color
         }
       >
         <h1>{this.props.value}</h1>
@@ -21,65 +20,118 @@ class Box extends React.Component {
 }
 
 class Row extends React.Component {
-  state = {
-    boxStates: Array(5).fill({
-      color: "dark",
-      value: "",
-    }),
-    currentBox: 0,
-  };
-
   renderSquare(i) {
     return (
       <Box
-        color={this.state.boxStates[i].color}
-        value={this.state.boxStates[i].value}
+        color={this.props.boxStates[i].color}
+        value={this.props.boxStates[i].value}
       />
     );
   }
 
+  render() {
+    return (
+      // render a row of squares
+      <span className="card-group">
+        {this.renderSquare(0)}
+        {this.renderSquare(1)}
+        {this.renderSquare(2)}
+        {this.renderSquare(3)}
+        {this.renderSquare(4)}
+      </span>
+    );
+  }
+}
+class Grid extends React.Component {
+  state = {
+    rowNumber: 0,
+    win: false,
+    gridState: [
+      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+    ],
+  };
+
+  getTodaysWord = () => {
+    const index = this.getDays();
+    return wordList[Math.floor(index)];
+  };
+
+  getDays = () => {
+    const date = new Date();
+    const start = new Date(2022, 1, 28);
+    const diff = date.getTime() - start.getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  };
+
+  isKeyValid = (key) => {
+    return key.length === 1 && key.match(/[a-z]/i);
+  };
+
+  isSubmissionLongEnough = (e, currentBox) => {
+    if (e.key === "Enter" && currentBox <= 4) {
+      alert("Invalid Submission");
+    }
+  };
+
   handleClick = (e) => {
-    let currentBox = this.state.currentBox;
-    let boxStates = this.state.boxStates.slice();
+    console.log(e.key);
+
+    let gridState = this.state.gridState.slice();
+    let rowState = gridState.splice(this.state.rowNumber, 1)[0];
+    let currentBox = rowState.currentBox;
+    let boxStates = rowState.boxStates;
+
     if (e.key === "Backspace" && currentBox > 0) {
       currentBox = currentBox >= 0 ? currentBox - 1 : 0;
-      boxStates[this.state.currentBox - 1] = {
+      boxStates[currentBox] = {
         color: "dark",
         value: " ",
       };
     }
-    if (e.key === "Enter" && currentBox <= 4) {
-      alert("Invalid Submission");
-    }
+
+    this.isSubmissionLongEnough(e);
 
     if (this.isKeyValid(e.key) && currentBox <= 4 && e.key !== "Enter") {
       const key = e.key.toUpperCase();
-      boxStates[this.state.currentBox] = {
+      boxStates[currentBox] = {
         color: "dark",
         value: key,
       };
       currentBox += 1;
     }
-    this.setState({
+    gridState.splice(this.state.rowNumber, 0, {
       boxStates: boxStates,
       currentBox: currentBox,
     });
+    console.log(gridState);
+    this.setState({
+      rowNumber: this.state.rowNumber,
+      win: false,
+      gridState: gridState,
+    });
+
     if (e.key === "Enter" && currentBox === 5) {
       let guess = "";
       for (let box of boxStates) {
         guess += box.value;
       }
       if (validWords.includes(guess.toLowerCase())) {
-        this.revealGuess(guess.toLowerCase());
+        this.revealGuess(guess.toLowerCase(), gridState);
       } else {
         alert("Invalid Submission");
       }
     }
   };
-  revealGuess = (guess) => {
+
+  revealGuess = (guess, gridState) => {
     const todaysWord = this.getTodaysWord();
     let todaysWordArray = todaysWord.split("");
-    let boxStates = this.state.boxStates.slice();
+    let boxStates = gridState.splice(this.state.rowNumber, 1)[0].boxStates;
     for (let i = 0; i < 5; i++) {
       if (guess[i] === todaysWord[i]) {
         boxStates[i] = {
@@ -98,112 +150,61 @@ class Row extends React.Component {
         todaysWordArray.splice(todaysWordArray.indexOf(`${guess[i]}`), 1);
       }
     }
-    this.setState({
+    gridState.splice(this.state.rowNumber, 0, {
       boxStates: boxStates,
-      currentBox: 0,
+      currentBox: 5,
+    });
+    this.setState({
+      rowNumber: this.state.rowNumber + 1,
+      win: this.didWin(guess, todaysWord, this.state.rowNumber),
+      gridState: gridState,
     });
   };
 
-  getTodaysWord = () => {
-    const index = this.getDays();
-    return wordList[Math.floor(index)];
-  };
+  didWin = (guess, todaysWord, rowNumber) => {
+    const win = guess === todaysWord;
+    if (win) {
+      this.endListenForKey();
+      alert(
+        `You won in ${rowNumber + 1} ${
+          rowNumber === 0 ? "turn" : "turns"
+        }! The word was ${todaysWord}.`
+      );
+    }
 
-  //Get days since Feb 28 2001
-  getDays = () => {
-    const date = new Date();
-    const start = new Date(2022, 1, 28);
-    const diff = date.getTime() - start.getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
-  };
-
-  isKeyValid = (key) => {
-    return key.length === 1 && key.match(/[a-z]/i);
+    return win;
   };
 
   listenForKey = document.addEventListener("keydown", this.handleClick);
+
   endListenForKey = () => {
     document.removeEventListener("keydown", this.handleClick);
   };
+
+  renderRow(i) {
+    return (
+      <div className="card-group justify-content-center">
+        <Row
+          boxStates={this.state.gridState[i].boxStates}
+          currentBox={this.state.gridState[i].currentBox}
+        />
+      </div>
+    );
+  }
+
   render() {
     return (
-      // render a row of squares
-      <span className="card-group">
-        {this.renderSquare(0)}
-        {this.renderSquare(1)}
-        {this.renderSquare(2)}
-        {this.renderSquare(3)}
-        {this.renderSquare(4)}
-      </span>
+      <div>
+        {this.renderRow(0)}
+        {this.renderRow(1)}
+        {this.renderRow(2)}
+        {this.renderRow(3)}
+        {this.renderRow(4)}
+        {this.renderRow(5)}
+      </div>
     );
   }
 }
-// class Grid extends React.Component {
-//   state = {
-//     rowNumber: 0,
-//     win: false,
-//     rowState: Array(6).fill({
-//       boxStates: Array(5).fill({
-//         color: "dark",
-//         value: "",
-//       }),
-//       currentBox: 0,
-//     }),
-//   };
-
-//   renderRow(i) {
-//     return <
-//   }
-
-//   render() {
-//     return (
-//       <div>
-//         <span className="card-group">
-//           {this.renderSquare(0)}
-//           {this.renderSquare(1)}
-//           {this.renderSquare(2)}
-//           {this.renderSquare(3)}
-//           {this.renderSquare(4)}
-//         </span>
-//         <span className="card-group">
-//           {this.renderSquare(0)}
-//           {this.renderSquare(1)}
-//           {this.renderSquare(2)}
-//           {this.renderSquare(3)}
-//           {this.renderSquare(4)}
-//         </span>
-//         <span className="card-group">
-//           {this.renderSquare(0)}
-//           {this.renderSquare(1)}
-//           {this.renderSquare(2)}
-//           {this.renderSquare(3)}
-//           {this.renderSquare(4)}
-//         </span>
-//         <span className="card-group">
-//           {this.renderSquare(0)}
-//           {this.renderSquare(1)}
-//           {this.renderSquare(2)}
-//           {this.renderSquare(3)}
-//           {this.renderSquare(4)}
-//         </span>
-//         <span className="card-group">
-//           {this.renderSquare(0)}
-//           {this.renderSquare(1)}
-//           {this.renderSquare(2)}
-//           {this.renderSquare(3)}
-//           {this.renderSquare(4)}
-//         </span>
-//         <span className="card-group">
-//           {this.renderSquare(0)}
-//           {this.renderSquare(1)}
-//           {this.renderSquare(2)}
-//           {this.renderSquare(3)}
-//           {this.renderSquare(4)}
-//         </span>
-//       </div>
-//     );
-//   }
-// }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<Row />);
+root.render(<Grid />);
