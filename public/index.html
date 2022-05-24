@@ -24,10 +24,14 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Shakespeare Wordle</title>
   </head>
-  <body>
+  <body class="bg-dark" style>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <nav class="navbar navbar-dark bg-dark justify-content-between">
+      <h3 class="text-light font-weight-bold px-3"> Shakespeare Wordle</h3>
+      <h3 class="text-light font-weight-bold px-3" onClick="findOptimalWord()"> Help </h3>
+    </nav>
     <div id="root"></div>
     <!--
       This HTML file is a template.

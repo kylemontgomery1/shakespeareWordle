@@ -10,10 +10,13 @@ class Box extends React.Component {
     return (
       <div
         className={
-          "card text-white text-center p-4  px-5 bg-" + this.props.color
+          "card text-white border-light text-center p-3 px-4 m-1 rounded-0 bg-" +
+          this.props.color
         }
       >
-        <h1>{this.props.value}</h1>
+        <h1 clasName="test-monospace" style={{ fontFamily: "monospace" }}>
+          {this.props.value}
+        </h1>
       </div>
     );
   }
@@ -32,7 +35,10 @@ class Row extends React.Component {
   render() {
     return (
       // render a row of squares
-      <span className="card-group">
+      <span
+        className="card-deck justify-content-center align-items-center"
+        style={{ display: "flex", flexDirection: "row" }}
+      >
         {this.renderSquare(0)}
         {this.renderSquare(1)}
         {this.renderSquare(2)}
@@ -47,12 +53,30 @@ class Grid extends React.Component {
     rowNumber: 0,
     win: false,
     gridState: [
-      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
-      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
-      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
-      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
-      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
-      { boxStates: Array(5).fill({ color: "dark", value: "" }), currentBox: 0 },
+      {
+        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        currentBox: 0,
+      },
+      {
+        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        currentBox: 0,
+      },
+      {
+        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        currentBox: 0,
+      },
+      {
+        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        currentBox: 0,
+      },
+      {
+        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        currentBox: 0,
+      },
+      {
+        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        currentBox: 0,
+      },
     ],
   };
 
@@ -90,7 +114,7 @@ class Grid extends React.Component {
       currentBox = currentBox >= 0 ? currentBox - 1 : 0;
       boxStates[currentBox] = {
         color: "dark",
-        value: " ",
+        value: "_",
       };
     }
 
@@ -133,21 +157,26 @@ class Grid extends React.Component {
     let todaysWordArray = todaysWord.split("");
     let boxStates = gridState.splice(this.state.rowNumber, 1)[0].boxStates;
     for (let i = 0; i < 5; i++) {
-      if (guess[i] === todaysWord[i]) {
-        boxStates[i] = {
-          color: "success",
-          value: guess[i].toUpperCase(),
-        };
-        todaysWordArray.splice(i, 1);
-      }
-    }
-    for (let i = 0; i < 5; i++) {
       if (todaysWordArray.includes(guess[i]) && guess[i] !== todaysWord[i]) {
         boxStates[i] = {
           color: "warning",
           value: guess[i].toUpperCase(),
         };
         todaysWordArray.splice(todaysWordArray.indexOf(`${guess[i]}`), 1);
+      } else {
+        boxStates[i] = {
+          color: "secondary",
+          value: guess[i].toUpperCase(),
+        };
+      }
+    }
+    for (let i = 0; i < 5; i++) {
+      if (guess[i] === todaysWord[i]) {
+        boxStates[i] = {
+          color: "success",
+          value: guess[i].toUpperCase(),
+        };
+        todaysWordArray.splice(i, 1);
       }
     }
     gridState.splice(this.state.rowNumber, 0, {
@@ -183,7 +212,7 @@ class Grid extends React.Component {
 
   renderRow(i) {
     return (
-      <div className="card-group justify-content-center">
+      <div className=" justify-content-center">
         <Row
           boxStates={this.state.gridState[i].boxStates}
           currentBox={this.state.gridState[i].currentBox}
