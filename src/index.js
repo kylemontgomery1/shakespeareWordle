@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.css";
 import validWords from "./validwords";
 import wordList from "./wordlist";
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
 class Box extends React.Component {
   render() {
