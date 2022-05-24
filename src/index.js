@@ -10,11 +10,11 @@ class Box extends React.Component {
     return (
       <div
         className={
-          "card text-white border-light text-center p-3 px-4 m-1 rounded-0 bg-" +
+          "card text-white border-light text-center p-3 px-4 m-1 rounded-0 align-items-center bg-" +
           this.props.color
         }
       >
-        <h1 clasName="test-monospace" style={{ fontFamily: "monospace" }}>
+        <h1 className="test-monospace" style={{ fontFamily: "monospace" }}>
           {this.props.value}
         </h1>
       </div>
@@ -49,45 +49,146 @@ class Row extends React.Component {
   }
 }
 class Grid extends React.Component {
+  renderRow(i) {
+    return (
+      <div className=" justify-content-center">
+        <Row
+          boxStates={this.props.gridState[i].boxStates}
+          currentBox={this.props.gridState[i].currentBox}
+        />
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        {this.renderRow(0)}
+        {this.renderRow(1)}
+        {this.renderRow(2)}
+        {this.renderRow(3)}
+        {this.renderRow(4)}
+        {this.renderRow(5)}
+      </div>
+    );
+  }
+}
+
+class Key extends React.Component {
+  render() {
+    return (
+      <div
+        className={
+          "card text-white text-center p-3 m-1 align-items-center d-flex rounded bg-" +
+          this.props.color
+        }
+        onClick={() => this.props.onClick(this.props.value)}
+      >
+        <p className="test-monospace" style={{ fontFamily: "monospace" }}>
+          {this.props.value}
+        </p>
+      </div>
+    );
+  }
+}
+
+class KeyRow extends React.Component {
+  renderKey(i) {
+    return (
+      <Key
+        color={this.props.keyBoardState[i].color}
+        value={this.props.keyBoardState[i].value}
+        onClick={this.props.onClick}
+      />
+    );
+  }
+
+  render() {
+    return (
+      // render a row of squares
+      <span
+        className="card-deck justify-content-center align-items-center"
+        style={{ display: "flex", flexDirection: "row" }}
+      >
+        {this.props.keyBoardState.map((x) => this.renderKey(x.key))}
+      </span>
+    );
+  }
+}
+
+class Game extends React.Component {
   state = {
     rowNumber: 0,
     win: false,
+    // todaysWord: this.getTodaysWord(),
     gridState: [
       {
-        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
         currentBox: 0,
       },
       {
-        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
         currentBox: 0,
       },
       {
-        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
         currentBox: 0,
       },
       {
-        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
         currentBox: 0,
       },
       {
-        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
         currentBox: 0,
       },
       {
-        boxStates: Array(5).fill({ color: "dark", value: "_" }),
+        boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
         currentBox: 0,
       },
     ],
+    keyBoardState: [
+      { color: "secondary", value: "Q", key: 0 },
+      { color: "secondary", value: "W", key: 1 },
+      { color: "secondary", value: "E", key: 2 },
+      { color: "secondary", value: "R", key: 3 },
+      { color: "secondary", value: "T", key: 4 },
+      { color: "secondary", value: "Y", key: 5 },
+      { color: "secondary", value: "U", key: 6 },
+      { color: "secondary", value: "I", key: 7 },
+      { color: "secondary", value: "O", key: 8 },
+      { color: "secondary", value: "P", key: 9 },
+      { color: "secondary", value: "A", key: 0 },
+      { color: "secondary", value: "S", key: 1 },
+      { color: "secondary", value: "D", key: 2 },
+      { color: "secondary", value: "F", key: 3 },
+      { color: "secondary", value: "G", key: 4 },
+      { color: "secondary", value: "H", key: 5 },
+      { color: "secondary", value: "J", key: 6 },
+      { color: "secondary", value: "K", key: 7 },
+      { color: "secondary", value: "L", key: 8 },
+      { color: "secondary", value: "Enter", key: 0 },
+      { color: "secondary", value: "Z", key: 1 },
+      { color: "secondary", value: "X", key: 2 },
+      { color: "secondary", value: "C", key: 3 },
+      { color: "secondary", value: "V", key: 4 },
+      { color: "secondary", value: "B", key: 5 },
+      { color: "secondary", value: "N", key: 6 },
+      { color: "secondary", value: "M", key: 7 },
+      { color: "secondary", value: "\u232B", key: 8 },
+    ],
   };
 
+  //grabs today's word from wordlist
   getTodaysWord = () => {
     const index = this.getDays();
     return wordList[Math.floor(index)];
   };
 
+  //calculates the number of days since the start of the game to determine which word to use
   getDays = () => {
     const date = new Date();
-    const start = new Date(2022, 1, 28);
+    const start = new Date(2021, 12, 7);
     const diff = date.getTime() - start.getTime();
     return Math.floor(diff / (1000 * 60 * 60 * 24));
   };
@@ -96,35 +197,75 @@ class Grid extends React.Component {
     return key.length === 1 && key.match(/[a-z]/i);
   };
 
-  isSubmissionLongEnough = (e, currentBox) => {
-    if (e.key === "Enter" && currentBox <= 4) {
+  isSubmissionLongEnough = (key, currentBox) => {
+    if (key === "Enter" && currentBox <= 4) {
       alert("Invalid Submission");
     }
   };
 
+  getKeyboardIndex = (key) => {
+    let indicies = {
+      Q: 0,
+      W: 1,
+      E: 2,
+      R: 3,
+      T: 4,
+      Y: 5,
+      U: 6,
+      I: 7,
+      O: 8,
+      P: 9,
+      A: 10,
+      S: 11,
+      D: 12,
+      F: 13,
+      G: 14,
+      H: 15,
+      J: 16,
+      K: 17,
+      L: 18,
+      Enter: 19,
+      Z: 20,
+      X: 21,
+      C: 22,
+      V: 23,
+      B: 24,
+      N: 25,
+      M: 26,
+      "\u232B": 27,
+    };
+    return indicies[key];
+  };
+
   handleClick = (e) => {
-    console.log(e.key);
+    let key;
+    if (typeof e === "string") {
+      key = e;
+    } else {
+      key = e.key;
+    }
 
     let gridState = this.state.gridState.slice();
     let rowState = gridState.splice(this.state.rowNumber, 1)[0];
     let currentBox = rowState.currentBox;
     let boxStates = rowState.boxStates;
+    let keyBoardState = this.state.keyBoardState.slice();
 
-    if (e.key === "Backspace" && currentBox > 0) {
+    if ((key === "Backspace" || key === "\u232B") && currentBox > 0) {
       currentBox = currentBox >= 0 ? currentBox - 1 : 0;
       boxStates[currentBox] = {
         color: "dark",
-        value: "_",
+        value: "\u00A0",
       };
     }
 
-    this.isSubmissionLongEnough(e);
+    this.isSubmissionLongEnough(key);
 
-    if (this.isKeyValid(e.key) && currentBox <= 4 && e.key !== "Enter") {
-      const key = e.key.toUpperCase();
+    if (this.isKeyValid(key) && currentBox <= 4 && key !== "Enter") {
+      const validKey = key.toUpperCase();
       boxStates[currentBox] = {
         color: "dark",
-        value: key,
+        value: validKey,
       };
       currentBox += 1;
     }
@@ -132,14 +273,16 @@ class Grid extends React.Component {
       boxStates: boxStates,
       currentBox: currentBox,
     });
-    console.log(gridState);
+
     this.setState({
       rowNumber: this.state.rowNumber,
       win: false,
+      // todaysWord: this.getTodaysWord(),
       gridState: gridState,
+      keyBoardState: keyBoardState,
     });
 
-    if (e.key === "Enter" && currentBox === 5) {
+    if (key === "Enter" && currentBox === 5) {
       let guess = "";
       for (let box of boxStates) {
         guess += box.value;
@@ -155,30 +298,65 @@ class Grid extends React.Component {
   revealGuess = (guess, gridState) => {
     const todaysWord = this.getTodaysWord();
     let todaysWordArray = todaysWord.split("");
+    let squaresChanged = [];
     let boxStates = gridState.splice(this.state.rowNumber, 1)[0].boxStates;
-    for (let i = 0; i < 5; i++) {
-      if (todaysWordArray.includes(guess[i]) && guess[i] !== todaysWord[i]) {
-        boxStates[i] = {
-          color: "warning",
-          value: guess[i].toUpperCase(),
-        };
-        todaysWordArray.splice(todaysWordArray.indexOf(`${guess[i]}`), 1);
-      } else {
-        boxStates[i] = {
-          color: "secondary",
-          value: guess[i].toUpperCase(),
-        };
-      }
-    }
+    let keyBoardState = this.state.keyBoardState.slice();
+
+    //denotes fully-correct tiles
     for (let i = 0; i < 5; i++) {
       if (guess[i] === todaysWord[i]) {
         boxStates[i] = {
           color: "success",
           value: guess[i].toUpperCase(),
         };
+        console.log(todaysWordArray);
         todaysWordArray.splice(i, 1);
+        if (i === 4) {
+          todaysWordArray.pop();
+        }
+        squaresChanged.push(i);
+        keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color =
+          "success";
       }
     }
+
+    //denotes partially-correct tiles
+    for (let i = 0; i < 5; i++) {
+      if (todaysWordArray.includes(guess[i]) && guess[i] !== todaysWord[i]) {
+        boxStates[i] = {
+          color: "warning",
+          value: guess[i].toUpperCase(),
+        };
+        squaresChanged.push(i);
+        if (
+          keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color !==
+          "success"
+        ) {
+          keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color =
+            "warning";
+        }
+      }
+    }
+
+    //denotes incorrect tiles
+    for (let i = 0; i < 5; i++) {
+      if (!squaresChanged.includes(i)) {
+        boxStates[i] = {
+          color: "secondary",
+          value: guess[i].toUpperCase(),
+        };
+        if (
+          keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color !==
+            "success" &&
+          keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color !==
+            "warning"
+        ) {
+          keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color =
+            "dark";
+        }
+      }
+    }
+
     gridState.splice(this.state.rowNumber, 0, {
       boxStates: boxStates,
       currentBox: 5,
@@ -186,7 +364,9 @@ class Grid extends React.Component {
     this.setState({
       rowNumber: this.state.rowNumber + 1,
       win: this.didWin(guess, todaysWord, this.state.rowNumber),
+      // todaysWord: todaysWord,
       gridState: gridState,
+      keyBoardState: keyBoardState,
     });
   };
 
@@ -210,30 +390,27 @@ class Grid extends React.Component {
     document.removeEventListener("keydown", this.handleClick);
   };
 
-  renderRow(i) {
-    return (
-      <div className=" justify-content-center">
-        <Row
-          boxStates={this.state.gridState[i].boxStates}
-          currentBox={this.state.gridState[i].currentBox}
-        />
-      </div>
-    );
-  }
-
   render() {
     return (
       <div>
-        {this.renderRow(0)}
-        {this.renderRow(1)}
-        {this.renderRow(2)}
-        {this.renderRow(3)}
-        {this.renderRow(4)}
-        {this.renderRow(5)}
+        <Grid gridState={this.state.gridState} />
+        <br></br>
+        <KeyRow
+          keyBoardState={this.state.keyBoardState.slice(0, 10)}
+          onClick={this.handleClick}
+        />
+        <KeyRow
+          keyBoardState={this.state.keyBoardState.slice(10, 19)}
+          onClick={this.handleClick}
+        />
+        <KeyRow
+          keyBoardState={this.state.keyBoardState.slice(19)}
+          onClick={this.handleClick}
+        />
       </div>
     );
   }
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<Grid />);
+root.render(<Game />);
