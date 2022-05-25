@@ -1,9 +1,12 @@
+// import React, { useState } from "react";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.css";
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+// import { Button, Modal } from "react-bootstrap";
 import validWords from "./validwords";
 import wordList from "./wordlist";
-import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+// import possiblePatterns from "./possiblePatterns";
 
 class Box extends React.Component {
   render() {
@@ -116,6 +119,50 @@ class KeyRow extends React.Component {
   }
 }
 
+// function Hint(props) {
+//   const [show, setShow] = useState(false);
+
+//   const handleClose = () => setShow(false);
+//   const handleShow = () => setShow(true);
+
+//   return (
+//     <>
+//       <Button className="mx-3" variant="outline-light" onClick={handleShow}>
+//         Hint
+//       </Button>
+
+//       <Modal show={show} onHide={handleClose}>
+//         <Modal.Header closeButton>
+//           <Modal.Title>Hint</Modal.Title>
+//         </Modal.Header>
+//         <Modal.Body>
+//           This optimal word is {props.onClick(props.wordList)}
+//         </Modal.Body>
+//         <Modal.Footer>
+//           <Button variant="secondary" onClick={handleClose}>
+//             Close
+//           </Button>
+//         </Modal.Footer>
+//       </Modal>
+//     </>
+//   );
+// }
+
+class NavBar extends React.Component {
+  render() {
+    return (
+      <nav className="navbar navbar-dark bg-dark justify-content-center">
+        <h3 className="text-light font-weight-bold px-3">
+          {" "}
+          Shakespeare Wordle
+        </h3>
+
+        {/* <Hint wordList={this.props.wordList} onClick={this.props.onClick} /> */}
+      </nav>
+    );
+  }
+}
+
 class Game extends React.Component {
   state = {
     rowNumber: 0,
@@ -177,6 +224,7 @@ class Game extends React.Component {
       { color: "secondary", value: "M", key: 7 },
       { color: "secondary", value: "\u232B", key: 8 },
     ],
+    // wordList: wordList,
   };
 
   //grabs today's word from wordlist
@@ -280,6 +328,7 @@ class Game extends React.Component {
       // todaysWord: this.getTodaysWord(),
       gridState: gridState,
       keyBoardState: keyBoardState,
+      // wordList: this.state.wordList,
     });
 
     if (key === "Enter" && currentBox === 5) {
@@ -301,6 +350,7 @@ class Game extends React.Component {
     let squaresChanged = [];
     let boxStates = gridState.splice(this.state.rowNumber, 1)[0].boxStates;
     let keyBoardState = this.state.keyBoardState.slice();
+    // let pattern = [0, 0, 0, 0, 0];
 
     //denotes fully-correct tiles
     console.log(todaysWordArray);
@@ -310,6 +360,7 @@ class Game extends React.Component {
           color: "success",
           value: guess[i].toUpperCase(),
         };
+        // pattern[i] = 2;
         todaysWordArray[i] = "";
         console.log(todaysWordArray);
         squaresChanged.push(i);
@@ -325,6 +376,7 @@ class Game extends React.Component {
           color: "warning",
           value: guess[i].toUpperCase(),
         };
+        // pattern[i] = 1;
         todaysWordArray[todaysWordArray.indexOf(guess[i])] = "";
         console.log(todaysWordArray);
         squaresChanged.push(i);
@@ -367,6 +419,7 @@ class Game extends React.Component {
       // todaysWord: todaysWord,
       gridState: gridState,
       keyBoardState: keyBoardState,
+      // wordList: this.findMatches(guess, this.state.wordList, pattern),
     });
   };
 
@@ -384,6 +437,91 @@ class Game extends React.Component {
     return win;
   };
 
+  // calculateEntropy = (word, wordList) => {
+  //   let entropy = 0;
+  //   for (let pattern of possiblePatterns) {
+  //     entropy += this.calculatePatternEntropy(word, wordList, pattern);
+  //   }
+  //   return entropy;
+  // };
+
+  // calculatePatternEntropy = (word, wordList, pattern) => {
+  //   const p =
+  //     this.findMatches(word, wordList, pattern).length / wordList.length;
+  //   if (p === 0) {
+  //     return 0;
+  //   }
+  //   return p * -Math.log2(p);
+  // };
+
+  // findMatches = (guess, wordList, pattern) => {
+  //   let matches = [...wordList];
+
+  //   for (let i = 0; i < 5; i++) {
+  //     if (pattern[i] === 0) {
+  //       //remove all words from wordlist with that letter from guess
+  //       for (let j = 0; j < matches.length; j++) {
+  //         if (matches[j].includes(guess[i])) {
+  //           matches[j] = null;
+  //         }
+  //       }
+  //     }
+  //     matches = matches.filter(Boolean);
+
+  //     if (pattern[i] === 1) {
+  //       //remove all words from wordlist with that letter from guess in that specific spot
+  //       for (let j = 0; j < matches.length; j++) {
+  //         if (matches[j][i] === guess[i]) {
+  //           matches[j] = null;
+  //         } else {
+  //           if (!matches[j].includes(guess[i])) {
+  //             matches[j] = null;
+  //           }
+  //         }
+  //       }
+  //     }
+  //     matches = matches.filter(Boolean);
+
+  //     if (pattern[i] === 2) {
+  //       //remove all words from wordlist that dont have letter from guess in that specific spot
+  //       for (let j = 0; j < matches.length; j++) {
+  //         if (matches[j][i] !== guess[i]) {
+  //           matches[j] = null;
+  //         }
+  //       }
+  //     }
+  //     matches = matches.filter(Boolean);
+  //   }
+  //   return matches;
+  // };
+
+  // findHighestEntropy = (wordList) => {
+  //   let entropyScores = [];
+  //   for (let word of wordList) {
+  //     let entropy = this.calculateEntropy(word, wordList);
+  //     if (!Number.isNaN(entropy)) {
+  //       entropyScores.push(Math.round(10000 * entropy));
+  //     }
+  //   }
+  //   let ret = wordList[this.indexOfMax(entropyScores)];
+  //   return ret;
+  // };
+
+  // indexOfMax = (arr) => {
+  //   if (arr.length === 0) {
+  //     return -1;
+  //   }
+  //   let max = arr[0];
+  //   let maxIndex = 0;
+  //   for (let i = 1; i < arr.length; i++) {
+  //     if (arr[i] > max) {
+  //       maxIndex = i;
+  //       max = arr[i];
+  //     }
+  //   }
+  //   return maxIndex;
+  // };
+
   listenForKey = document.addEventListener("keydown", this.handleClick);
 
   endListenForKey = () => {
@@ -393,6 +531,10 @@ class Game extends React.Component {
   render() {
     return (
       <div>
+        <NavBar
+          onClick={this.findHighestEntropy}
+          wordList={this.state.wordList}
+        />
         <Grid gridState={this.state.gridState} />
         <br></br>
         <KeyRow
