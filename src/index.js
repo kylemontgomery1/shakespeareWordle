@@ -303,17 +303,15 @@ class Game extends React.Component {
     let keyBoardState = this.state.keyBoardState.slice();
 
     //denotes fully-correct tiles
+    console.log(todaysWordArray);
     for (let i = 0; i < 5; i++) {
       if (guess[i] === todaysWord[i]) {
         boxStates[i] = {
           color: "success",
           value: guess[i].toUpperCase(),
         };
+        todaysWordArray[i] = "";
         console.log(todaysWordArray);
-        todaysWordArray.splice(i, 1);
-        if (i === 4) {
-          todaysWordArray.pop();
-        }
         squaresChanged.push(i);
         keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color =
           "success";
@@ -327,6 +325,8 @@ class Game extends React.Component {
           color: "warning",
           value: guess[i].toUpperCase(),
         };
+        todaysWordArray[todaysWordArray.indexOf(guess[i])] = "";
+        console.log(todaysWordArray);
         squaresChanged.push(i);
         if (
           keyBoardState[this.getKeyboardIndex(guess[i].toUpperCase())].color !==
