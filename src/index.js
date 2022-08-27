@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.css";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-// import { Button, Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import validWords from "./validwords";
 import wordList from "./wordlist";
 // import possiblePatterns from "./possiblePatterns";
@@ -132,11 +132,52 @@ class NavBar extends React.Component {
   }
 }
 
+class PopUpWin extends React.Component {
+  render() {
+    return (
+      <Modal
+        show={this.props.win}
+        onHide={this.props.closeModal}
+        className="fade"
+      >
+        <Modal.Body className="bg-dark text-light text-center">
+          Woohoo, you won in {this.props.turns}{" "}
+          {this.props.turns === 1 ? "turn" : "turns"}!<br></br>
+          <br></br>
+          <Button variant="secondary" onClick={this.props.closeModal}>
+            Close
+          </Button>
+        </Modal.Body>
+      </Modal>
+    );
+  }
+}
+
+class PopUpLost extends React.Component {
+  render() {
+    return (
+      <Modal
+        show={this.props.lost}
+        onHide={this.props.closeModal}
+        className="fade"
+      >
+        <Modal.Body className="bg-dark text-light text-center">
+          Shucks, you lost! Better luck tomorrow.<br></br>
+          <br></br>
+          <Button variant="secondary" onClick={this.props.closeModal}>
+            Close
+          </Button>
+        </Modal.Body>
+      </Modal>
+    );
+  }
+}
+
 class Game extends React.Component {
   state = {
     rowNumber: 0,
     win: false,
-    // todaysWord: this.getTodaysWord(),
+    lost: false,
     gridState: [
       {
         boxStates: Array(5).fill({ color: "dark", value: "\u00A0" }),
@@ -294,7 +335,7 @@ class Game extends React.Component {
     this.setState({
       rowNumber: this.state.rowNumber,
       win: false,
-      // todaysWord: this.getTodaysWord(),
+      lost: false,
       gridState: gridState,
       keyBoardState: keyBoardState,
       // wordList: this.state.wordList,
@@ -385,7 +426,7 @@ class Game extends React.Component {
     this.setState({
       rowNumber: this.state.rowNumber + 1,
       win: this.didWin(guess, todaysWord, this.state.rowNumber),
-      // todaysWord: todaysWord,
+      lost: this.state.rowNumber === 5,
       gridState: gridState,
       keyBoardState: keyBoardState,
       // wordList: this.findMatches(guess, this.state.wordList, pattern),
@@ -396,11 +437,11 @@ class Game extends React.Component {
     const win = guess === todaysWord;
     if (win) {
       this.endListenForKey();
-      alert(
-        `You won loser in ${rowNumber + 1} ${
-          rowNumber === 0 ? "turn" : "turns"
-        }! The word was ${todaysWord}.`
-      );
+      // alert(
+      //   `You won in ${rowNumber + 1} ${
+      //     rowNumber === 0 ? "turn" : "turns"
+      //   }! The word was ${todaysWord}.`
+      // );
     }
 
     return win;
@@ -412,13 +453,23 @@ class Game extends React.Component {
     document.removeEventListener("keydown", this.handleClick);
   };
 
+  closeModal = () =>
+    this.setState({
+      rowNumber: this.state.rowNumber,
+      win: false,
+      lost: false,
+    });
+
   render() {
     return (
       <div>
-        <NavBar
-          onClick={this.findHighestEntropy}
-          wordList={this.state.wordList}
+        <NavBar />
+        <PopUpWin
+          win={this.state.win}
+          closeModal={this.closeModal}
+          turns={this.state.rowNumber}
         />
+        <PopUpLost lost={this.state.lost} closeModal={this.closeModal} />
         <Grid gridState={this.state.gridState} />
         <br></br>
         <KeyRow
