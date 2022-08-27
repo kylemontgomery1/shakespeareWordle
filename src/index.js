@@ -119,35 +119,6 @@ class KeyRow extends React.Component {
   }
 }
 
-// function Hint(props) {
-//   const [show, setShow] = useState(false);
-
-//   const handleClose = () => setShow(false);
-//   const handleShow = () => setShow(true);
-
-//   return (
-//     <>
-//       <Button className="mx-3" variant="outline-light" onClick={handleShow}>
-//         Hint
-//       </Button>
-
-//       <Modal show={show} onHide={handleClose}>
-//         <Modal.Header closeButton>
-//           <Modal.Title>Hint</Modal.Title>
-//         </Modal.Header>
-//         <Modal.Body>
-//           This optimal word is {props.onClick(props.wordList)}
-//         </Modal.Body>
-//         <Modal.Footer>
-//           <Button variant="secondary" onClick={handleClose}>
-//             Close
-//           </Button>
-//         </Modal.Footer>
-//       </Modal>
-//     </>
-//   );
-// }
-
 class NavBar extends React.Component {
   render() {
     return (
@@ -156,8 +127,6 @@ class NavBar extends React.Component {
           {" "}
           Shakespeare Wordle
         </h3>
-
-        {/* <Hint wordList={this.props.wordList} onClick={this.props.onClick} /> */}
       </nav>
     );
   }
@@ -428,7 +397,7 @@ class Game extends React.Component {
     if (win) {
       this.endListenForKey();
       alert(
-        `You won in ${rowNumber + 1} ${
+        `You won loser in ${rowNumber + 1} ${
           rowNumber === 0 ? "turn" : "turns"
         }! The word was ${todaysWord}.`
       );
@@ -436,91 +405,6 @@ class Game extends React.Component {
 
     return win;
   };
-
-  // calculateEntropy = (word, wordList) => {
-  //   let entropy = 0;
-  //   for (let pattern of possiblePatterns) {
-  //     entropy += this.calculatePatternEntropy(word, wordList, pattern);
-  //   }
-  //   return entropy;
-  // };
-
-  // calculatePatternEntropy = (word, wordList, pattern) => {
-  //   const p =
-  //     this.findMatches(word, wordList, pattern).length / wordList.length;
-  //   if (p === 0) {
-  //     return 0;
-  //   }
-  //   return p * -Math.log2(p);
-  // };
-
-  // findMatches = (guess, wordList, pattern) => {
-  //   let matches = [...wordList];
-
-  //   for (let i = 0; i < 5; i++) {
-  //     if (pattern[i] === 0) {
-  //       //remove all words from wordlist with that letter from guess
-  //       for (let j = 0; j < matches.length; j++) {
-  //         if (matches[j].includes(guess[i])) {
-  //           matches[j] = null;
-  //         }
-  //       }
-  //     }
-  //     matches = matches.filter(Boolean);
-
-  //     if (pattern[i] === 1) {
-  //       //remove all words from wordlist with that letter from guess in that specific spot
-  //       for (let j = 0; j < matches.length; j++) {
-  //         if (matches[j][i] === guess[i]) {
-  //           matches[j] = null;
-  //         } else {
-  //           if (!matches[j].includes(guess[i])) {
-  //             matches[j] = null;
-  //           }
-  //         }
-  //       }
-  //     }
-  //     matches = matches.filter(Boolean);
-
-  //     if (pattern[i] === 2) {
-  //       //remove all words from wordlist that dont have letter from guess in that specific spot
-  //       for (let j = 0; j < matches.length; j++) {
-  //         if (matches[j][i] !== guess[i]) {
-  //           matches[j] = null;
-  //         }
-  //       }
-  //     }
-  //     matches = matches.filter(Boolean);
-  //   }
-  //   return matches;
-  // };
-
-  // findHighestEntropy = (wordList) => {
-  //   let entropyScores = [];
-  //   for (let word of wordList) {
-  //     let entropy = this.calculateEntropy(word, wordList);
-  //     if (!Number.isNaN(entropy)) {
-  //       entropyScores.push(Math.round(10000 * entropy));
-  //     }
-  //   }
-  //   let ret = wordList[this.indexOfMax(entropyScores)];
-  //   return ret;
-  // };
-
-  // indexOfMax = (arr) => {
-  //   if (arr.length === 0) {
-  //     return -1;
-  //   }
-  //   let max = arr[0];
-  //   let maxIndex = 0;
-  //   for (let i = 1; i < arr.length; i++) {
-  //     if (arr[i] > max) {
-  //       maxIndex = i;
-  //       max = arr[i];
-  //     }
-  //   }
-  //   return maxIndex;
-  // };
 
   listenForKey = document.addEventListener("keydown", this.handleClick);
 
