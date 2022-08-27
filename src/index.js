@@ -426,7 +426,9 @@ class Game extends React.Component {
     this.setState({
       rowNumber: this.state.rowNumber + 1,
       win: this.didWin(guess, todaysWord, this.state.rowNumber),
-      lost: this.state.rowNumber === 5,
+      lost:
+        (this.state.rowNumber === 5) &
+        (this.didWin(guess, todaysWord, this.state.rowNumber) === false),
       gridState: gridState,
       keyBoardState: keyBoardState,
       // wordList: this.findMatches(guess, this.state.wordList, pattern),
